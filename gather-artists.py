@@ -22,15 +22,11 @@ token = credentials.get_access_token()
 sp = spotipy.Spotify(auth=token)
 
 # # # Get list of artists with the genre 'christmas'
-i = 0
-while i <= 100:
-    results = sp.search(q='genre:christmas', offset=i, type='artist', limit=50)
-    print(results['artists']['items'])
-    i += 1
-
-
-
-
-
-#results = spotify.search(q='genre:christmas', type='album')
-#print(results)
+with open("artist-uris.txt",'w') as writefile:
+    i = 0
+    while i <= 100:
+        results = sp.search(q='genre:christmas', offset=i, type='artist', limit=50)
+        items = results['artists']['items']
+        for item in items:
+            writefile.write(item['uri'] + "\n")
+        i += 1
