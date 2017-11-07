@@ -13,6 +13,11 @@ with open('../spotify-christmas-keysecret.txt', encoding="ascii") as txtfile:
 
     print(client_id + "\n" + client_secret)
 
+wiki_christmas = []
+with open('wiki-christmas-albums.txt') as readfile:
+    for line in readfile:
+        wiki_christmas.append(line[:-1].lower())
+
 # # # Spotify authentication
 credentials = oauth2.SpotifyClientCredentials(
         client_id=client_id,
@@ -27,19 +32,36 @@ with open("album-uris.txt") as urifile:
     for line in urifile:
         album_uris.append(line)
 
+# # # Get christmas only album uris
+christmas_albums = []
+for uri in album_uris:
+    album_uri = uri[:-1]
+    try:
+        to_check = sp.album(album_uri)
+    except:
+        token = credentials.get_access_token()
+        sp = spotipy.Spotify(auth=token)
+        to_check = sp.album(album_uri)
+    print(to_check["genres"], to_check["name"])
+    print(album_uri)
+    album_name = to_check["name"].lower()
+    if 'christmas' in to_check["genres"]:
+        print(uri)
+        christmas_albums.append(album_uri)
+    elif re.search('christmas', album_name):
+        print(album_name, uri)
+        christmas_albums.append(album_uri)
+    elif re.search('holiday', album_name):
+        print(album_name)
+        christmas_albums.append(album_uri)
+    elif re.search('winter', album_name):
+        print(album_name)
+        christmas_albums.append(album_uri)
+    elif album_name in wiki_christmas:
+        print(album_name)
+        christmas_albums.append(album_uri)
+    print(len(christmas_albums))
 
-# # # Get albums uris
-with open("christmas-album-uris.txt",'w') as wfile:
-    for uri in album_uris:
-        #print(uri[:-1])
-        to_check = sp.album(uri[:-1])
-        print(to_check["genres"],to_check["name"])
-        if 'christmas' in to_check["genres"]:
-            print(uri)
-            wfile.write(uri)
-        elif re.search('christmas',to_check["name"].lower()):
-            print(to_check["name"])
-            wfile.write(uri)
-        elif re.search('holiday',to_check["name"].lower()):
-            print(to_check["name"])
-            wfile.write(uri)
+with open("christmas-album-uris.txt", "w") as wfile:
+    for christmas_album in christmas_albums:
+        wfile.write(christmas_album)
