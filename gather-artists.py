@@ -22,46 +22,16 @@ credentials = oauth2.SpotifyClientCredentials(
 token = credentials.get_access_token()
 sp = spotipy.Spotify(auth=token)
 
-# # # Get list of artists with the genre 'christmas'
-with open("artist-uris.csv",'w') as csvwritefile:
-    writer = csv.writer(csvwritefile)
-    i = 0
-    while i <= 100:
-        results = sp.search(q='genre:christmas', offset=i, type='artist', limit=50)
-        items = results['artists']['items']
-        for item in items:
-            writer.writerow([item['uri'],item['name']])
-        i += 1
 
-# # # Get list of artists with the genre 'holiday'
-with open("artist-uris.csv",'w') as csvwritefile:
+with open("artist-uris.csv",'a+') as csvwritefile:
     writer = csv.writer(csvwritefile)
+    # # # Get list of artists with the genre 'christmas'
     i = 0
-    while i <= 100:
-        results = sp.search(q='genre:holiday', offset=i, type='artist', limit=50)
-        items = results['artists']['items']
-        for item in items:
-            writer.writerow([item['uri'], item['name']])
-        i += 1
+    while i <= 5000:
+        results = sp.search(q='genre:christmas',limit=50,type='artist',offset=i )
+        for artist in results['artists']['items']:
+            writer.writerow([artist['name'],artist['uri']])
+        if len(results['artists']['items']) == 0:
+            break
+        i += 50
 
-# # # Get list of artists with the genre 'chanukah'
-with open("artist-uris.csv",'w') as csvwritefile:
-    writer = csv.writer(csvwritefile)
-    i = 0
-    while i <= 100:
-        results = sp.search(q='genre:chanukah', offset=i, type='artist', limit=50)
-        items = results['artists']['items']
-        for item in items:
-            writer.writerow([item['uri'], item['name']])
-        i += 1
-
-# # # Get list of artists with the genre 'carols'
-with open("artist-uris.csv",'w') as csvwritefile:
-    writer = csv.writer(csvwritefile)
-    i = 0
-    while i <= 100:
-        results = sp.search(q='genre:carols', offset=i, type='artist', limit=50)
-        items = results['artists']['items']
-        for item in items:
-            writer.writerow(item['uri'], item['name'])
-        i += 1
