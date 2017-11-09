@@ -37,16 +37,19 @@ with open("christmas-uris.csv","a+",encoding='utf-8') as writefile:
     csvwriter = csv.writer(writefile)
     for uri in album_uris:
         try:
-            to_check = sp.album(uri)
+            try:
+                to_check = sp.album(uri)
+            except:
+                token = credentials.get_access_token()
+                sp = spotipy.Spotify(auth=token)
+                to_check = sp.album(uri)
+            if len(to_check["genres"]) == 0:
+                csvwriter.writerow([to_check["name"],uri,"UNKNOWN"])
+            else:
+                if 'christmas' in to_check["genres"] or 'holiday' in to_check["genres"] or 'carols' in to_check["genres"] or 'chanukah' in to_check["genres"]:
+                    csvwriter.writerow([to_check["name"],uri,"KNOWN"])
         except:
-            token = credentials.get_access_token()
-            sp = spotipy.Spotify(auth=token)
-            to_check = sp.album(uri)
-        if len(to_check["genres"]) == 0:
-            csvwriter.writerow([to_check["name"],uri,"UNKNOWN"])
-        else:
-            if 'christmas' in to_check["genres"] or 'holiday' in to_check["genres"] or 'carols' in to_check["genres"] or 'chanukah' in to_check["genres"]:
-                csvwriter.writerow([to_check["name"],uri,"KNOWN"])
+            print("something went wrong")
 
 # # # Get christmas only album uris
 '''christmas_albums = []
